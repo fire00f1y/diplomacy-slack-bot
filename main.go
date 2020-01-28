@@ -2,8 +2,8 @@
 package diplomacy_slack_bot
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/monoculum/formam"
 	"log"
 	"net/http"
 )
@@ -45,52 +45,54 @@ var block = `{
 
 type Request struct {
 	// deprecated. you should not use this anymore
-	Token string `json:"token,omitempty"`
+	Token string `json:"token,omitempty" form:"token,omitempty"`
 
 	// The comment that was typed into the request trigger AKA the actual slash command
-	Command string `json:"command,omitempty"`
+	Command string `json:"command,omitempty" form:"command,omitempty"`
 
 	// The part after the slash command.
-	Text string  `json:"text,omitempty"`
+	Text string  `json:"text,omitempty" form:"text,omitempty"`
 
 	// A temporary webhook URL that you can use to generate messages responses
 	// usng https://api.slack.com/interactivity/handling#message_responses
-	ResponseUrl string `json:"response_url,omitempty"`
+	ResponseUrl string `json:"response_url,omitempty" form:"response_url,omitempty"`
 
 	// A short-lived ID that will let your app open a modal
-	TriggerId string `json:"trigger_id,omitempty"`
+	TriggerId string `json:"trigger_id,omitempty" form:"trigger_id,omitempty"`
 
 	//The ID of the user who triggerd the command
-	UserId string `json:"user_id,omitempty"`
+	UserId string `json:"user_id,omitempty" form:"user_id,omitempty"`
 
 	// The plain text name of the user who triggered the command. This is being phased out
 	// in favor of the user_id
-	UserName string `json:"user_name,omitempty"`
+	UserName string `json:"user_name,omitempty" form:"user_name,omitempty"`
 
 	// Workspace ID where the command was triggered
-	TeamId string `json:"team_id,omitempty"`
-	TeamName string `json:"team_name,omitempty"`
+	TeamId string `json:"team_id,omitempty" form:"team_id,omitempty"`
+	TeamName string `json:"team_name,omitempty" form:"team_name,omitempty"`
 
 	// Enterprise Grid ID
-	EnterpriseId string `json:"enterprise_id,omitempty"`
-	EnterpriseName string `json:"enterprise_name,omitempty"`
+	EnterpriseId string `json:"enterprise_id,omitempty" form:"enterprise_id,omitempty"`
+	EnterpriseName string `json:"enterprise_name,omitempty" form:"enterprise_name,omitempty"`
 
 	// Channel ID where the command was triggered
-	ChannelId string `json:"channel_id,omitempty"`
-	ChannelName string `json:"channel_name,omitempty"`
-
-
+	ChannelId string `json:"channel_id,omitempty" form:"channel_id,omitempty"`
+	ChannelName string `json:"channel_name,omitempty" form:"channel_name,omitempty"`
 }
 
 // HelloWorld prints the JSON encoded "message" field in the body
 // of the request or "Hello, World!" if there isn't one.
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
 	var request Request
-	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
+	w.Header().Set("Content-type", "application/json")
+	if e := r.ParseMultipartForm(0); e != nil {
 		fmt.Fprint(w, e)
 	}
-
-	log.Printf("incoming request: %q\n", request)
+	if e := formam.NewDecoder(&formam.DecoderOptions{TagName: "form"}).Decode(r.Form, &request); e != nil {
+		log.Printf("error parsing multipart fields: %v\n", e)
+	} else {
+		log.Printf("Parseds successfully! Object: \n%q\n", request)
+	}
+	
 	fmt.Fprint(w, block)
 }
