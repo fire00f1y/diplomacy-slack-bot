@@ -3,7 +3,7 @@ package diplomacy_slack_bot
 
 import (
 	"fmt"
-	"github.com/monoculum/formam"
+	//"github.com/monoculum/formam"
 	"io/ioutil"
 	"log"
 	"net/http"
