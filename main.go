@@ -88,8 +88,9 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	b, e := ioutil.ReadAll(r.Body)
 	if e != nil {
-		log.Printf("failed to read message body: %v\n", e)
+		log.Printf("failed to read message body: %s\n", string(b))
 	} else {
+		log.Printf("Request body: \n%q\n", b)
 		defer r.Body.Close()
 	}
 	//if e := r.ParseMultipartForm(0); e != nil {
