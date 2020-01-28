@@ -90,6 +90,7 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		log.Printf("failed to read message body: %s\n", string(b))
 	} else {
+		log.Printf("Request: %v\n", r)
 		log.Printf("Request body: \n%q\n", b)
 		defer r.Body.Close()
 	}
