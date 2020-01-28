@@ -84,7 +84,7 @@ type Request struct {
 // HelloWorld prints the JSON encoded "message" field in the body
 // of the request or "Hello, World!" if there isn't one.
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
-	var request Request
+	//var request Request
 	w.Header().Set("Content-type", "application/json")
 	b, e := ioutil.ReadAll(r.Body)
 	if e != nil {
