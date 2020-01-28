@@ -4,6 +4,7 @@ package diplomacy_slack_bot
 import (
 	"fmt"
 	"github.com/monoculum/formam"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -85,14 +86,20 @@ type Request struct {
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	var request Request
 	w.Header().Set("Content-type", "application/json")
-	if e := r.ParseMultipartForm(0); e != nil {
-		fmt.Fprint(w, e)
-	}
-	if e := formam.NewDecoder(&formam.DecoderOptions{TagName: "form"}).Decode(r.Form, &request); e != nil {
-		log.Printf("error parsing multipart fields: %v\n", e)
+	b, e := ioutil.ReadAll(r.Body)
+	if e != nil {
+		log.Printf("failed to read message body: %v\n", e)
 	} else {
-		log.Printf("Parseds successfully! Object: \n%q\n", request)
+		defer r.Body.Close()
 	}
-	
+	//if e := r.ParseMultipartForm(0); e != nil {
+	//	log.Printf("failed to parse multipart data: %v\n", e)
+	//}
+	//if e := formam.NewDecoder(&formam.DecoderOptions{TagName: "form"}).Decode(r.Form, &request); e != nil {
+	//	log.Printf("error parsing multipart fields: %v\n", e)
+	//} else {
+	//	log.Printf("Parsed successfully! Object: \n%q\n", request)
+	//}
+
 	fmt.Fprint(w, block)
 }
