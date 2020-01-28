@@ -4,6 +4,7 @@ package diplomacy_slack_bot
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -84,10 +85,12 @@ type Request struct {
 // HelloWorld prints the JSON encoded "message" field in the body
 // of the request or "Hello, World!" if there isn't one.
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
-	var request Request
-
-	json.NewDecoder(r.Body).Decode(&request)
-
 	w.Header().Set("Content-type", "application/json")
+	var request Request
+	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
+		fmt.Fprint(w, e)
+	}
+
+	log.Printf("incoming request: %q\n", request)
 	fmt.Fprint(w, block)
 }
